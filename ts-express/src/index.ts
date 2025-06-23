@@ -6,7 +6,7 @@ import { serve } from "inngest/express";
 import { inngest } from "./client";
 import * as functions from "./fns";
 
-const port = process.env.PORT || 3939;
+const port = Number(process.env.PORT || "3939");
 
 const app = express();
 
@@ -20,5 +20,5 @@ const handler = serve({
 app.use("/api/inngest", handler);
 
 app.listen(port, () => {
-  console.log(`Server started on 0.0.0.0:${port}`);
+  console.log(`server started on 0.0.0.0:${port}`);
 });

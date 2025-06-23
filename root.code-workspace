@@ -5,16 +5,13 @@
       "path": "."
     },
     {
-      "name": "py/fastapi",
-      "path": "./py/fastapi"
+      "path": "./py-fastapi"
     },
     {
-      "name": "py/flask",
-      "path": "./py/flask"
+      "path": "./py-flask"
     },
     {
-      "name": "ts/express",
-      "path": "./ts/express"
+      "path": "./ts-express"
     }
   ]
 }

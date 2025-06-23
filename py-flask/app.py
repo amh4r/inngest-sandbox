@@ -6,7 +6,7 @@ from src.client import inngest_client
 from src import fns
 import dotenv
 
-dotenv.load_dotenv("../../.env")
+dotenv.load_dotenv()
 port = int(os.getenv("PORT", "3939"))
 
 functions: list[inngest.Function[typing.Any]] = []

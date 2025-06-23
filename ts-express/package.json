@@ -2,7 +2,7 @@
     "name": "sandbox-ts-express",
     "version": "0.0.0",
     "scripts": {
-      "dev": "DOTENV_CONFIG_PATH=../../.env tsx -r dotenv/config --watch src/index.ts"
+      "dev": "tsx -r dotenv/config --watch src/index.ts"
     },
     "nodemonConfig": {
       "watch": [
