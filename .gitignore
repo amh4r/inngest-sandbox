@@ -1,0 +1,16 @@
+.DS_Store
+.env
+.inngest
+
+# JavaScript
+node_modules
+
+# Python
+*.egg-info
+*.py[oc]
+.mypy_cache
+.venv
+__pycache__
+build
+dist
+wheels

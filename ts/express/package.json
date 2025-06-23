@@ -1,0 +1,25 @@
+{
+    "name": "sandbox-ts-express",
+    "version": "0.0.0",
+    "scripts": {
+      "dev": "DOTENV_CONFIG_PATH=../../.env tsx -r dotenv/config --watch src/index.ts"
+    },
+    "nodemonConfig": {
+      "watch": [
+        "index.ts",
+        "**/*.ts"
+      ],
+      "ext": "ts"
+    },
+    "dependencies": {
+      "dotenv": "^16.0.3",
+      "express": "^4.19.2",
+      "inngest": "3.39.2"
+    },
+    "devDependencies": {
+      "@types/express": "^4.17.17",
+      "tsx": "^4.19.1",
+      "typescript": "4.8.2"
+    }
+  }
+  
