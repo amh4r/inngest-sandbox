@@ -2,7 +2,8 @@
     "name": "sandbox-ts-express",
     "version": "0.0.0",
     "scripts": {
-      "dev": "tsx -r dotenv/config --watch src/index.ts"
+      "dev": "tsx -r dotenv/config --watch src/index.ts",
+      "prod": "export INNGEST_DEV=0 && tsx -r dotenv/config --watch src/index.ts"
     },
     "nodemonConfig": {
       "watch": [

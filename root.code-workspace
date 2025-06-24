@@ -5,6 +5,9 @@
       "path": "."
     },
     {
+      "path": "./go"
+    },
+    {
       "path": "./py-fastapi"
     },
     {
