@@ -8,6 +8,9 @@
       "path": "./go"
     },
     {
+      "path": "./nginx"
+    },
+    {
       "path": "./py-fastapi"
     },
     {
