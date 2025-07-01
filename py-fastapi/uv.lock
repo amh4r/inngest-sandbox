@@ -129,7 +129,7 @@ wheels = [
 
 [[package]]
 name = "inngest"
-version = "0.5.0a1"
+version = "0.5.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "httpx" },
@@ -137,9 +137,9 @@ dependencies = [
     { name = "pydantic" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4f/19/4a17593174238c894c4e34976a49e0ed0c666e512bcd9f399ddc8b6f0c4a/inngest-0.5.0a1.tar.gz", hash = "sha256:f15bfdc2375fb680ee51332ac758e7b332a63e06ee91224276cf221f7ca9d10f", size = 81730 }
+sdist = { url = "https://files.pythonhosted.org/packages/d4/13/3f963e8bf572f62e709258c5f0aa7d97ee4abf22ef2eec8c9730d5f5c9f5/inngest-0.5.1.tar.gz", hash = "sha256:c985e406076c87bac90cfc3bc8fd017da42db99af73c5bc9f0b120d14d2db36f", size = 78665 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f8/5d/12876b770a02ccc9eca76b687e28fa278efd332d1a9e73162e8a2dd20104/inngest-0.5.0a1-py3-none-any.whl", hash = "sha256:17b17ed1bc7fa62abf5b965d2ef9116d7213c273786ddc85a39fceff9f09cbe9", size = 116973 },
+    { url = "https://files.pythonhosted.org/packages/e5/95/18dcb89b5e66535e175591fdd50ae14debf588c429a8f3bbffef8b00f274/inngest-0.5.1-py3-none-any.whl", hash = "sha256:deb84fdc0f3a37bbf12fcc0683f137e010633d825135445f79beac5ed2a06e96", size = 120813 },
 ]
 
 [[package]]
@@ -361,7 +361,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "fastapi", specifier = ">=0.115.13" },
-    { name = "inngest", specifier = ">=0.5.0a1" },
+    { name = "inngest", specifier = ">=0.5.1" },
     { name = "mypy", specifier = ">=1.16.1" },
     { name = "python-dotenv", specifier = ">=1.1.0" },
     { name = "ruff", specifier = ">=0.12.0" },
