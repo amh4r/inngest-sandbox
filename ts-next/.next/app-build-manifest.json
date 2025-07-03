@@ -1,9 +1,0 @@
-{
-  "pages": {
-    "/api/inngest/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/inngest/route.js"
-    ]
-  }
-}

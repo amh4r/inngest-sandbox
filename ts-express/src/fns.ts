@@ -6,6 +6,7 @@ export const fn1 = inngest.createFunction(
     retries: 0,
   },
   { event: "event-1" },
-  async ({ step }) => {
+  async () => {
+    return "Hello world!";
   }
 );

@@ -1,9 +1,12 @@
 import { inngest } from "./client";
 
-export const helloWorld = inngest.createFunction(
-  { id: "hello-world" },
-  { event: "test/hello.world" },
+export const fn1 = inngest.createFunction(
+  {
+    id: "fn-1",
+    retries: 0,
+  },
+  { event: "event-1" },
   async () => {
-    return "Hi";
+    return "Hello world!";
   }
 );
