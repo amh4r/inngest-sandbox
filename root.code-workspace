@@ -18,6 +18,9 @@
     },
     {
       "path": "./ts-express"
+    },
+    {
+      "path": "./ts-next"
     }
   ]
 }
