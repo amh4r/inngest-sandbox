@@ -17,6 +17,9 @@
       "path": "./py-flask"
     },
     {
+      "path": "./ts-cloudflare-worker"
+    },
+    {
       "path": "./ts-express"
     },
     {
