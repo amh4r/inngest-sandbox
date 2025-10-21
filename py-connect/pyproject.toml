@@ -1,0 +1,12 @@
+[project]
+name = "sandbox-py-connect"
+version = "0.0.0"
+description = "Add your description here"
+requires-python = ">=3.10"
+dependencies = [
+    "inngest[connect]==0.5.6",
+    "mypy==1.17.1",
+    "python-dotenv==1.1.1",
+    "ruff==0.12.12",
+    "structlog==25.4.0",
+]

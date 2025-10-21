@@ -11,6 +11,9 @@
       "path": "./nginx"
     },
     {
+      "path": "./py-connect"
+    },
+    {
       "path": "./py-fastapi"
     },
     {
@@ -18,6 +21,9 @@
     },
     {
       "path": "./ts-cloudflare-worker"
+    },
+    {
+      "path": "./ts-connect"
     },
     {
       "path": "./ts-express"
