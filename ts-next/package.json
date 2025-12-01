@@ -6,22 +6,22 @@
     "prod": "export INNGEST_DEV=0 && next dev -p 3939"
   },
   "dependencies": {
-    "dotenv": "16.0.3",
-    "inngest": "3.40.2",
-    "next": "15.3.4",
-    "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "dotenv": "17.2.3",
+    "inngest": "3.46.0",
+    "next": "16.0.6",
+    "react": "19.2.0",
+    "react-dom": "19.2.0"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "3.3.1",
-    "@tailwindcss/postcss": "4.1.11",
-    "@types/node": "24.0.10",
-    "@types/react": "19.1.8",
-    "@types/react-dom": "19.1.6",
-    "eslint": "9.30.1",
-    "eslint-config-next": "15.3.4",
-    "tailwindcss": "4.1.11",
-    "typescript": "5.8.3"
+    "@eslint/eslintrc": "3.3.3",
+    "@tailwindcss/postcss": "4.1.17",
+    "@types/node": "24.10.1",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "eslint": "9.39.1",
+    "eslint-config-next": "16.0.6",
+    "tailwindcss": "4.1.17",
+    "typescript": "5.9.3"
   },
-  "packageManager": "pnpm@8.15.8+sha512.d1a029e1a447ad90bc96cd58b0fad486d2993d531856396f7babf2d83eb1823bb83c5a3d0fc18f675b2d10321d49eb161fece36fe8134aa5823ecd215feed392"
+  "packageManager": "pnpm@>=10.16.0"
 }

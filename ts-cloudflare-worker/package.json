@@ -9,13 +9,14 @@
 		"test": "vitest",
 		"cf-typegen": "wrangler types"
 	},
-	"devDependencies": {
-		"@cloudflare/vitest-pool-workers": "~0.8.19",
-		"typescript": "5.5.2",
-		"vitest": "~3.2.0",
-		"wrangler": "4.35.0"
-	},
 	"dependencies": {
-		"inngest": "3.40.3"
-	}
+		"inngest": "3.46.0"
+	},
+	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "0.10.11",
+		"typescript": "5.9.3",
+		"vitest": "4.0.14",
+		"wrangler": "4.51.0"
+	},
+	"packageManager": "pnpm@>=10.16.0"
 }

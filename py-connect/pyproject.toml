@@ -1,7 +1,6 @@
 [project]
-name = "sandbox-py-connect"
+name = "py-connect"
 version = "0.0.0"
-description = "Add your description here"
 requires-python = ">=3.10"
 dependencies = [
     "inngest[connect]==0.5.6",

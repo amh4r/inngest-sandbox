@@ -2,6 +2,19 @@
 
 Polyglot sandbox for Inngest. Useful for testing features and troubleshooting.
 
+## Getting started
+
+```sh
+# Install Python dependencies
+uv sync
+
+# Install TypeScript dependencies
+pnpm install
+
+# Create root env var file
+cp example.env .env
+```
+
 ## Usage
 
 Run Dev Server:
@@ -11,15 +24,19 @@ npx inngest-cli@latest dev -u localhost:3939/api/inngest
 
 Start an app:
 ```sh
+# Go app
 (cd go && make dev)
-(cd py-fastapi && make dev)
-(cd py-flask && make dev)
-(cd ts-express && make dev)
+
+# Python apps
+uv run --directory py-fastapi make dev
+uv run --directory py-flask make dev
+uv run --directory py-connect make dev
+
+# TypeScript apps
+pnpm -C ts-express run dev
+pnpm -C ts-cloudflare-worker run dev
+pnpm -C ts-connect run dev
+pnpm -C ts-next run dev
 ```
 
-## Tips
-
-If you're using a VSCode IDE, you can use the `root.code-workspace` file to view each example as a workspace:
-```sh
-code root.code-workspace
-```
+Env vars in the root `.env` file reflect in all apps.
