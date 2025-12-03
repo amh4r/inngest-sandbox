@@ -6,7 +6,7 @@ Polyglot sandbox for Inngest. Useful for testing features and troubleshooting.
 
 ```sh
 # Install Python dependencies
-uv sync
+uv sync --all-packages
 
 # Install TypeScript dependencies
 pnpm install
