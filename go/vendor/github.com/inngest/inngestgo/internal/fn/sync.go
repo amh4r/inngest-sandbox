@@ -8,7 +8,7 @@ func GetFnSyncConfig(fn ServableFunction) *SyncConfig {
 	return &SyncConfig{
 		Name:        fn.Name(),
 		Slug:        fn.FullyQualifiedID(),
-		Triggers:    []Trigger{fn.Trigger()},
+		Triggers:    fn.Trigger().Triggers(),
 		Concurrency: config.Concurrency,
 		Priority:    config.Priority,
 		EventBatch:  config.BatchEvents,
@@ -75,7 +75,9 @@ type SyncConfig struct {
 	Cancel []Cancel `json:"cancel,omitempty"`
 
 	// Singleton represents a mechanism to ensure that only one instance of a function
-	// runs at a time for a given key. Additional invocations with the same key will be skipped.
+	// runs at a time for a given key. Additional invocations with the same key will either
+	// be ignored or cause the current instance to be canceled and replaced, depending on
+	// the specified mode.
 	Singleton *Singleton
 
 	Steps map[string]SDKStep `json:"steps"`

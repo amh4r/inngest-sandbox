@@ -16,18 +16,31 @@ import (
 // matching signal was not received before the timeout.
 var ErrSignalNotReceived = fmt.Errorf("signal not received")
 
+type SignalConfict string
+
+const (
+	// SignalConflictFail fails the run if another signal currently exists.  This is the default behaviour.
+	SignalConflictFail SignalConfict = "fail"
+	// SignalConflictReplace replaces an existing signal if the signal currently exists.  Any run
+	// waiting for the previous signal will fail.
+	SignalConflictReplace SignalConfict = "replace"
+)
+
 type WaitForSignalOpts struct {
 	// Name represents the optional step name.
-	Name string
+	Name string `json:"name"`
 	// Signal is the signal to wait for.  This is a string unique to your environment
 	// which will resume this particular function run.  If this signal already exists,
 	// the step will error.
 	//
 	// For resuming multiple runs from a signal, use WaitForEvent.  Generally speaking,
 	// WaitForEvent fulfils WaitForSignal with fan out and an improved DX.
-	Signal string
+	Signal string `json:"signal"`
 	// Timeout is how long to wait.  We must always timebound event lsiteners.
-	Timeout time.Duration
+	Timeout time.Duration `json:"timeout"`
+
+	// OnConflict
+	OnConflict SignalConfict `json:"onConflict"`
 }
 
 // rawSignalResult is the raw result stored in step state.  We always embed step output
@@ -42,17 +55,21 @@ type SignalResult[T any] struct {
 }
 
 func WaitForSignal[T any](ctx context.Context, stepID string, opts WaitForSignalOpts) (SignalResult[T], error) {
-	mgr := preflight(ctx)
-
+	targetID := getTargetStepID(ctx)
+	mgr := preflight(ctx, enums.OpcodeWaitForSignal)
 	args := map[string]any{
-		"signal":  opts.Signal,
-		"timeout": str2duration.String(opts.Timeout),
+		"signal":   opts.Signal,
+		"timeout":  str2duration.String(opts.Timeout),
+		"conflict": SignalConflictFail,
 	}
 	if opts.Name == "" {
 		opts.Name = stepID
 	}
-
-	op := mgr.NewOp(enums.OpcodeWaitForSignal, stepID, args)
+	if opts.OnConflict != "" {
+		args["conflict"] = opts.OnConflict
+	}
+	op := mgr.NewOp(enums.OpcodeWaitForSignal, stepID)
+	hashedID := op.MustHash()
 
 	// Check if this exists already.
 	if val, ok := mgr.Step(ctx, op); ok {
@@ -62,17 +79,24 @@ func WaitForSignal[T any](ctx context.Context, stepID string, opts WaitForSignal
 		}
 		if err := json.Unmarshal(val, &output); err != nil {
 			mgr.SetErr(fmt.Errorf("error unmarshalling wait for signal value in '%s': %w", opts.Signal, err))
-			panic(ControlHijack{})
+			panic(sdkrequest.ControlHijack{})
 		}
 		return output.Data, nil
 	}
 
-	mgr.AppendOp(sdkrequest.GeneratorOpcode{
-		ID:          op.MustHash(),
+	if targetID != nil && *targetID != hashedID {
+		// Don't report this step since targeting is happening and it isn't
+		// targeted
+		panic(sdkrequest.ControlHijack{})
+	}
+
+	plannedOp := sdkrequest.GeneratorOpcode{
+		ID:          hashedID,
 		Op:          op.Op,
 		Name:        opts.Name,
 		DisplayName: &opts.Name,
-		Opts:        op.Opts,
-	})
-	panic(ControlHijack{})
+		Opts:        args,
+	}
+	mgr.AppendOp(ctx, plannedOp)
+	panic(sdkrequest.ControlHijack{})
 }

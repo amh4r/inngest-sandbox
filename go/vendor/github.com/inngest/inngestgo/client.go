@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/inngest/inngestgo/internal/middleware"
+	"github.com/inngest/inngestgo/pkg/env"
 )
 
 const (
@@ -206,7 +207,7 @@ func (a apiClient) IsDev() bool {
 	if a.Dev != nil {
 		return *a.Dev
 	}
-	return IsDev()
+	return env.IsDev()
 }
 
 type ServeOpts struct {
@@ -260,7 +261,7 @@ func (a apiClient) Send(ctx context.Context, e any) (string, error) {
 }
 
 func (a apiClient) SendMany(ctx context.Context, e []any) (ids []string, err error) {
-	go func() {
+	defer func() {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("panic sending events: %v", r)
 		}
@@ -368,7 +369,7 @@ func (a apiClient) eventAPIBaseURL() string {
 	}
 
 	if a.IsDev() {
-		return DevServerURL()
+		return env.DevServerURL()
 	}
 
 	return defaultEventAPIOrigin
