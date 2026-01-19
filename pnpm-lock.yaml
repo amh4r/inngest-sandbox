@@ -6,6 +6,8 @@ settings:
 
 importers:
 
+  .: {}
+
   ts-cloudflare-worker:
     dependencies:
       inngest:
