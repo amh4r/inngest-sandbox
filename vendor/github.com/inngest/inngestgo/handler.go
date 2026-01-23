@@ -27,6 +27,7 @@ import (
 	"github.com/inngest/inngestgo/internal/middleware"
 	"github.com/inngest/inngestgo/internal/sdkrequest"
 	"github.com/inngest/inngestgo/internal/types"
+	"github.com/inngest/inngestgo/internal/util"
 	"github.com/inngest/inngestgo/pkg/env"
 	"github.com/inngest/inngestgo/pkg/httputil"
 	"github.com/inngest/inngestgo/step"
@@ -536,8 +537,14 @@ func (h *handler) inBandSync(
 			Status: 400,
 		}
 	}
-	if h.URL != nil {
-		appURL = h.URL
+
+	appURL, err = overrideURL(appURL, h.handlerOpts)
+	if err != nil {
+		h.Logger.Error("error parsing app URL", "error", err)
+		return publicerr.Error{
+			Err:    fmt.Errorf("error parsing app URL: %w", err),
+			Status: 400,
+		}
 	}
 
 	fns, err := createFunctionConfigs(h.appName, h.funcs, *appURL, false)
@@ -555,7 +562,7 @@ func (h *handler) inBandSync(
 	if err != nil {
 		return fmt.Errorf("error creating inspection: %w", err)
 	}
-	inspectionMap, err := types.StructToMap(inspection)
+	inspectionMap, err := util.StructToMap(inspection)
 	if err != nil {
 		return fmt.Errorf("error converting inspection to map: %w", err)
 	}
@@ -596,9 +603,6 @@ func (h *handler) outOfBandSync(w http.ResponseWriter, r *http.Request) error {
 	h.l.Lock()
 	defer h.l.Unlock()
 
-	scheme := httputil.GetScheme(r)
-	host := r.Host
-
 	// Get the sync ID from the URL and then remove it, since we don't want the
 	// sync ID to show in the function URLs (that would affect the checksum and
 	// is ugly in the UI)
@@ -607,7 +611,20 @@ func (h *handler) outOfBandSync(w http.ResponseWriter, r *http.Request) error {
 	qp.Del("deployId")
 	r.URL.RawQuery = qp.Encode()
 
-	pathAndParams := r.URL.String()
+	appURL, err := url.Parse(fmt.Sprintf(
+		"%s://%s%s?%s",
+		httputil.GetScheme(r),
+		r.Host,
+		r.URL.Path,
+		r.URL.RawQuery,
+	))
+	if err != nil {
+		return fmt.Errorf("error parsing request URL: %w", err)
+	}
+	appURL, err = overrideURL(appURL, h.handlerOpts)
+	if err != nil {
+		return fmt.Errorf("error overriding request URL: %w", err)
+	}
 
 	appVersion := ""
 	if h.AppVersion != nil {
@@ -615,7 +632,7 @@ func (h *handler) outOfBandSync(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	config := types.RegisterRequest{
-		URL:        fmt.Sprintf("%s://%s%s", scheme, host, pathAndParams),
+		URL:        appURL.String(),
 		V:          "1",
 		DeployType: types.DeployTypePing,
 		SDK:        HeaderValueSDK,
@@ -628,7 +645,7 @@ func (h *handler) outOfBandSync(w http.ResponseWriter, r *http.Request) error {
 		AppVersion:   appVersion,
 	}
 
-	fns, err := createFunctionConfigs(h.appName, h.funcs, *h.url(r), false)
+	fns, err := createFunctionConfigs(h.appName, h.funcs, *appURL, false)
 	if err != nil {
 		return fmt.Errorf("error creating function configs: %w", err)
 	}
@@ -693,17 +710,6 @@ func (h *handler) outOfBandSync(w http.ResponseWriter, r *http.Request) error {
 	w.Header().Add(HeaderKeySyncKind, SyncKindOutOfBand)
 
 	return nil
-}
-
-func (h *handler) url(r *http.Request) *url.URL {
-	if h.URL != nil {
-		return h.URL
-	}
-
-	// Get the current URL.
-	scheme := httputil.GetScheme(r)
-	u, _ := url.Parse(fmt.Sprintf("%s://%s%s", scheme, r.Host, r.RequestURI))
-	return u
 }
 
 func createFunctionConfigs(
@@ -832,6 +838,7 @@ func (h *handler) invoke(w http.ResponseWriter, r *http.Request) error {
 		mw,
 		fn,
 		h.GetSigningKey(),
+		h.GetSigningKeyFallback(),
 		request,
 		stepID,
 	)
@@ -844,13 +851,20 @@ func (h *handler) invoke(w http.ResponseWriter, r *http.Request) error {
 	// For that reason, we check those values first.
 	noRetry := sdkerrors.IsNoRetryError(err)
 	retryAt := sdkerrors.GetRetryAtTime(err)
+
 	if len(ops) == 1 && ops[0].Op == enums.OpcodeStepError {
 		// Now we've handled error types we can ignore step
 		// errors safely.
 		err = nil
 	}
 
-	// Now that we've handled the OpcodeStepError, if we *still* ahve
+	// Handle OpcodeStepFailed for permanent step failures
+	if len(ops) == 1 && ops[0].Op == enums.OpcodeStepFailed {
+		err = nil
+		noRetry = true
+	}
+
+	// Now that we've handled the OpcodeStepError, if we *still* have
 	// a StepError kind returned from a function we must have an unhandled
 	// step error.  This is a NonRetryableError, as the most likely code is:
 	//
@@ -1000,14 +1014,6 @@ func (h *handler) createSecureInspection() (*secureInspection, error) {
 		env = &val
 	}
 
-	var serveOrigin, servePath *string
-	if h.URL != nil {
-		serveOriginStr := h.URL.Scheme + "://" + h.URL.Host
-		serveOrigin = &serveOriginStr
-
-		servePath = &h.URL.Path
-	}
-
 	authenticationSucceeded = true
 	insecureInspection, err := h.createInsecureInspection(&authenticationSucceeded)
 	if err != nil {
@@ -1026,8 +1032,8 @@ func (h *handler) createSecureInspection() (*secureInspection, error) {
 		SDKVersion:             SDKVersion,
 		SigningKeyFallbackHash: signingKeyFallbackHash,
 		SigningKeyHash:         signingKeyHash,
-		ServeOrigin:            serveOrigin,
-		ServePath:              servePath,
+		ServeOrigin:            serveOriginOverride(h.handlerOpts),
+		ServePath:              servePathOverride(h.handlerOpts),
 	}, nil
 }
 
@@ -1168,6 +1174,7 @@ func invoke(
 	mw *middleware.MiddlewareManager,
 	sf ServableFunction,
 	signingKey string,
+	signingKeyFallback string,
 	input *sdkrequest.Request,
 	stepID *string,
 ) (any, []sdkrequest.GeneratorOpcode, error) {
@@ -1192,12 +1199,14 @@ func invoke(
 
 	// This must be a pointer so that it can be mutated from within function tools.
 	mgr := sdkrequest.NewManager(sdkrequest.Opts{
-		Fn:         sf,
-		Middleware: mw,
-		Cancel:     cancel,
-		Request:    input,
-		SigningKey: signingKey,
-		Mode:       sdkrequest.StepModeYield,
+		Fn:                 sf,
+		Middleware:         mw,
+		Cancel:             cancel,
+		Request:            input,
+		SigningKey:         signingKey,
+		SigningKeyFallback: signingKeyFallback,
+		Mode:               sdkrequest.StepModeYield,
+		APIBaseURL:         env.APIServerURL(client.Options().APIBaseURL),
 	})
 	fCtx = sdkrequest.SetManager(fCtx, mgr)
 
@@ -1211,7 +1220,7 @@ func invoke(
 		sf,
 		inputVal,
 		input.Event,
-		types.ToAnySlice(input.Events),
+		util.ToAnySlice(input.Events),
 	)
 	if err != nil {
 		return nil, nil, err
@@ -1220,7 +1229,7 @@ func invoke(
 	// Set InputCtx
 	callCtx := InputCtx{
 		Env:        input.CallCtx.Env,
-		FunctionID: input.CallCtx.FunctionID,
+		FunctionID: input.CallCtx.FunctionID.String(),
 		RunID:      input.CallCtx.RunID,
 		StepID:     input.CallCtx.StepID,
 		Attempt:    input.CallCtx.Attempt,
@@ -1294,7 +1303,7 @@ func invoke(
 				sf,
 				inputVal,
 				mwInput.Event,
-				types.ToAnySlice(mwInput.Events),
+				util.ToAnySlice(mwInput.Events),
 			)
 			if err != nil {
 				mgr.SetErr(err)
