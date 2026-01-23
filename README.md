@@ -40,3 +40,9 @@ pnpm -C ts-next run dev
 ```
 
 Env vars in the root `.env` file reflect in all apps.
+
+## Updating Inngest dependencies
+
+```sh
+go run ./cli update-inngest
+```
