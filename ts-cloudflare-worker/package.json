@@ -10,7 +10,7 @@
 		"cf-typegen": "wrangler types"
 	},
 	"dependencies": {
-		"inngest": "3.49.3"
+		"inngest": "3.52.0"
 	},
 	"devDependencies": {
 		"@cloudflare/vitest-pool-workers": "0.10.11",

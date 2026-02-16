@@ -98,7 +98,7 @@ func updatePython() error {
 		updatePyprojectTOML(filepath.Join(dir, "pyproject.toml"), version)
 	}
 
-	return runInRoot("uv", "sync")
+	return runInRoot("uv", "sync", "--all-packages")
 }
 
 func updateTypeScript() error {
