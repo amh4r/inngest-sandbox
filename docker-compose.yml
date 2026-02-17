@@ -1,0 +1,27 @@
+services:
+  dev-server:
+    image: "inngest/inngest:v1.17.0"
+    pull_policy: "always"
+    command: "inngest dev -u http://host.docker.internal:3939/api/inngest"
+    ports:
+      - "8288:8288"
+
+  ts-connect:
+    build:
+      context: "./ts-connect"
+      dockerfile: "../ts.Dockerfile"
+    environment:
+      INNGEST_DEV: "http://dev-server:8288"
+    depends_on:
+      - "dev-server"
+
+  ts-express:
+    build:
+      context: "./ts-express"
+      dockerfile: "../ts.Dockerfile"
+    ports:
+      - "3939:3939"
+    environment:
+      INNGEST_DEV: "http://dev-server:8288"
+    depends_on:
+      - "dev-server"
