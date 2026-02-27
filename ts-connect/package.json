@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "dotenv": "17.2.3",
-    "inngest": "3.52.0"
+    "inngest": "3.52.3"
   },
   "devDependencies": {
     "tsx": "4.21.0",
