@@ -1,15 +1,18 @@
 {
-  "name": "ts-connect",
+  "name": "ts-v3-express",
   "version": "0.0.0",
   "scripts": {
     "dev": "tsx -r dotenv/config --watch src/index.ts",
     "prod": "export INNGEST_DEV=0 && tsx -r dotenv/config --watch src/index.ts"
   },
   "dependencies": {
+    "@inngest/middleware-encryption": "1.0.2",
     "dotenv": "17.2.3",
-    "inngest": "^4.0.0"
+    "express": "5.1.0",
+    "inngest": "3.52.3"
   },
   "devDependencies": {
+    "@types/express": "5.0.5",
     "tsx": "4.21.0",
     "typescript": "5.9.3"
   },

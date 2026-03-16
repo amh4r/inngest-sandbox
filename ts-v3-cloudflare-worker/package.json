@@ -1,5 +1,5 @@
 {
-  "name": "ts-cloudflare-worker",
+  "name": "ts-v3-cloudflare-worker",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -10,7 +10,7 @@
     "cf-typegen": "wrangler types"
   },
   "dependencies": {
-    "inngest": "^4.0.0"
+    "inngest": "3.52.3"
   },
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "0.10.11",

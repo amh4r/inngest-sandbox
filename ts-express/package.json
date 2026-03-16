@@ -1,5 +1,5 @@
 {
-  "name": "sandbox-ts-express",
+  "name": "ts-express",
   "version": "0.0.0",
   "scripts": {
     "dev": "tsx -r dotenv/config --watch src/index.ts",
@@ -9,7 +9,7 @@
     "@inngest/middleware-encryption": "1.0.2",
     "dotenv": "17.2.3",
     "express": "5.1.0",
-    "inngest": "3.52.3"
+    "inngest": "^4.0.0"
   },
   "devDependencies": {
     "@types/express": "5.0.5",

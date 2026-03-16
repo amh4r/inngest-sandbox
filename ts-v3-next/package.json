@@ -1,5 +1,5 @@
 {
-  "name": "ts-next",
+  "name": "ts-v3-next",
   "version": "0.0.0",
   "scripts": {
     "dev": "next dev -p 3939",
@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "dotenv": "17.2.3",
-    "inngest": "^4.0.0",
+    "inngest": "3.52.3",
     "next": "16.0.6",
     "react": "19.2.0",
     "react-dom": "19.2.0"
