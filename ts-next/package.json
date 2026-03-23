@@ -2,8 +2,8 @@
   "name": "ts-next",
   "version": "0.0.0",
   "scripts": {
-    "dev": "next dev -p 3939",
-    "prod": "export INNGEST_DEV=0 && next dev -p 3939"
+    "dev": "INNGEST_DEV=1 next dev -p 3939",
+    "prod": "next dev -p 3939"
   },
   "dependencies": {
     "dotenv": "17.2.3",
