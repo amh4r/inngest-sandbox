@@ -2,8 +2,8 @@
   "name": "ts-connect",
   "version": "0.0.0",
   "scripts": {
-    "dev": "INNGEST_DEV=1 tsx -r dotenv/config --watch src/index.ts",
-    "prod": "tsx -r dotenv/config --watch src/index.ts"
+    "dev": "INNGEST_DEV=1 DOTENV_CONFIG_PATH=../.env tsx -r dotenv/config --watch src/index.ts",
+    "prod": "DOTENV_CONFIG_PATH=../.env tsx -r dotenv/config --watch src/index.ts"
   },
   "dependencies": {
     "dotenv": "17.2.3",

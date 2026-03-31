@@ -2,8 +2,8 @@
   "name": "ts-express",
   "version": "0.0.0",
   "scripts": {
-    "dev": "INNGEST_DEV=1 tsx -r dotenv/config --watch src/index.ts",
-    "prod": "tsx -r dotenv/config --watch src/index.ts"
+    "dev": "INNGEST_DEV=1 DOTENV_CONFIG_PATH=../.env tsx -r dotenv/config --watch src/index.ts",
+    "prod": "DOTENV_CONFIG_PATH=../.env tsx -r dotenv/config --watch src/index.ts"
   },
   "dependencies": {
     "@inngest/middleware-encryption": "1.0.2",
