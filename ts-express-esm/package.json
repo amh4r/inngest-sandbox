@@ -1,6 +1,7 @@
 {
-  "name": "ts-express",
+  "name": "ts-express-esm",
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
     "dev": "INNGEST_DEV=1 DOTENV_CONFIG_PATH=../.env tsx -r dotenv/config --watch src/index.ts",
     "prod": "DOTENV_CONFIG_PATH=../.env tsx -r dotenv/config --watch src/index.ts"
