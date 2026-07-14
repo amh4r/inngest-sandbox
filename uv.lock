@@ -163,7 +163,7 @@ wheels = [
 
 [[package]]
 name = "inngest"
-version = "0.5.16"
+version = "0.5.19"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "httpx" },
@@ -171,9 +171,9 @@ dependencies = [
     { name = "pydantic" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b1/2e/3a3b8b578bcf96e72aebf1f592e42b2c8ebfe86f070026c099b4b22f56f3/inngest-0.5.16.tar.gz", hash = "sha256:a5feeaf809a5dcdf868716c443e430859e74c48213dbf481069ec589cf070fdc", size = 90820, upload-time = "2026-02-25T20:51:22.817Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/27/c8/30524cd80447ba6abff85f4c2a3a536da9a55a6bb6d997cddfe2576076a1/inngest-0.5.19.tar.gz", hash = "sha256:f7be69f9dc4b4bd2d4ceab06e2a4e8cdbf48bb705904faccb926ba23224637e0", size = 109356, upload-time = "2026-06-23T19:37:30.29Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3c/28/3b83d1baa48d4ff3771105f54c68eda94a099ee2f498f7a113d2b1cd618e/inngest-0.5.16-py3-none-any.whl", hash = "sha256:c365fe46eaa5152c0b26b64d2dda075b6477bea519acdf9e8ac1dafff0fc2202", size = 138061, upload-time = "2026-02-25T20:51:21.444Z" },
+    { url = "https://files.pythonhosted.org/packages/eb/fb/e395348a44fe2332973db228c90c1f2ca9be921bdc8aa3d06dfaa50e63c9/inngest-0.5.19-py3-none-any.whl", hash = "sha256:1d4804c49c0a4e3e4bb8adf603f19a2daf2d433ba743bd8958116f6c76a9b028", size = 151683, upload-time = "2026-06-23T19:37:29.032Z" },
 ]
 
 [package.optional-dependencies]
@@ -421,7 +421,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "inngest", extras = ["connect"], specifier = "==0.5.16" },
+    { name = "inngest", extras = ["connect"], specifier = "==0.5.19" },
     { name = "mypy", specifier = "==1.17.1" },
     { name = "python-dotenv", specifier = "==1.1.1" },
     { name = "ruff", specifier = "==0.12.12" },
@@ -445,7 +445,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "fastapi", specifier = "==0.116.1" },
-    { name = "inngest", specifier = "==0.5.16" },
+    { name = "inngest", specifier = "==0.5.19" },
     { name = "mypy", specifier = "==1.17.1" },
     { name = "python-dotenv", specifier = "==1.1.1" },
     { name = "ruff", specifier = "==0.12.12" },
@@ -469,7 +469,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "flask", specifier = "==3.1.2" },
-    { name = "inngest", specifier = "==0.5.16" },
+    { name = "inngest", specifier = "==0.5.19" },
     { name = "mypy", specifier = "==1.17.1" },
     { name = "python-dotenv", specifier = "==1.1.1" },
     { name = "ruff", specifier = "==0.12.12" },
