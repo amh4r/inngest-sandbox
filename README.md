@@ -19,13 +19,18 @@ cp example.env .env
 
 Run Dev Server:
 ```sh
+# HTTP examples
 npx inngest-cli@latest dev -u localhost:3939/api/inngest
+
+# Connect examples
+npx inngest-cli@latest dev
 ```
 
 Start an app:
 ```sh
 # Go app
 (cd go && make dev)
+(cd go-connect && make dev)
 
 # Python apps
 uv run --directory py-fastapi make dev
@@ -40,6 +45,11 @@ pnpm -C ts-next run dev
 ```
 
 Env vars in the root `.env` file reflect in all apps.
+
+The `go-connect`, `py-connect`, and `ts-connect` examples use Inngest Connect,
+so they open an outbound worker connection and do not need a dev-server `-u`
+URL. Start the dev server with `npx inngest-cli@latest dev`, then run the
+Connect app in a separate terminal.
 
 ## Updating Inngest dependencies
 

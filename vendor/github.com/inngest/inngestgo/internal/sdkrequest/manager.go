@@ -6,18 +6,17 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"log/slog"
 	"slices"
 	"sync"
 	"time"
 
 	"github.com/inngest/inngest/pkg/enums"
-	"github.com/inngest/inngestgo/experimental"
 	"github.com/inngest/inngestgo/internal/checkpoint"
 	"github.com/inngest/inngestgo/internal/fn"
-	"github.com/inngest/inngestgo/internal/middleware"
+	"github.com/inngest/inngestgo/internal/logger"
 	"github.com/inngest/inngestgo/internal/opcode"
 	"github.com/inngest/inngestgo/internal/util"
+	"github.com/inngest/inngestgo/middleware"
 )
 
 type ControlHijack struct{}
@@ -72,7 +71,7 @@ type InvocationManager interface {
 	// retrieve creds for eg. publishing or API alls.
 	SigningKey() string
 	// CallContext exposes the call context for middleware calls.
-	CallContext() experimental.CallContext
+	CallContext() middleware.CallContext
 	// StepMode returns how steps should be executed in this context
 	StepMode() StepMode
 	// SetStepMode overrides the step mode.
@@ -82,6 +81,9 @@ type InvocationManager interface {
 	// SetFn updates the servable function.  This is necessary because functions are discovered
 	// before the first step execution in REST-based sync functions.
 	SetFn(fn.ServableFunction)
+	// CloseCheckpointer cancels any pending background checkpoint timers.
+	// It should be called when the function invocation completes.
+	CloseCheckpointer()
 }
 
 type Opts struct {
@@ -144,6 +146,7 @@ func NewManager(opts Opts) InvocationManager {
 		request:    opts.Request,
 		indexes:    map[string]int{},
 		l:          &sync.RWMutex{},
+		opsLock:    &sync.Mutex{},
 		signingKey: opts.SigningKey,
 		seen:       map[string]struct{}{},
 		seenLock:   &sync.RWMutex{},
@@ -185,6 +188,8 @@ type requestCtxManager struct {
 	// Ops holds a list of buffered generator opcodes to send to the executor
 	// after this invocation.
 	ops []GeneratorOpcode
+	// guards the response buffer shared by appends, checkpoints, and response reads.
+	opsLock *sync.Mutex
 	// request represents the incoming request.
 	request *Request
 	// Indexes represents a map of indexes for each unhashed op.
@@ -242,11 +247,13 @@ func (r *requestCtxManager) AppendOp(ctx context.Context, op GeneratorOpcode) {
 	// Always add the current parallelism mode to the opcode we're appending.
 	op.SetParallelMode(ParallelMode(ctx))
 
+	r.opsLock.Lock()
 	if r.ops == nil {
 		r.ops = []GeneratorOpcode{op}
 	} else {
 		r.ops = append(r.ops, op)
 	}
+	r.opsLock.Unlock()
 
 	// If we're planning multiple steps, append and continue on without any hijacking
 	// in every case.  Without this, we won't continue to plan the next set of parallel
@@ -291,17 +298,18 @@ func (r *requestCtxManager) AppendOp(ctx context.Context, op GeneratorOpcode) {
 
 		r.checkpointer.WithStep(ctx, op, func(done []opcode.Step, err error) {
 			if err == nil {
-				// Remove each step that's checkpointed from our buffer.  The manager's buffer
-				// is used as the response data, and given these steps have already been checkpointed
-				// we no longer need to send them in the SDK response.
+				// drop checkpointed steps from the response buffer.  the callback shares
+				// this slice with appends and response reads.
+				r.opsLock.Lock()
 				for _, op := range done {
 					r.ops = slices.DeleteFunc(r.ops, func(f opcode.Step) bool {
 						return op.ID == f.ID
 					})
 				}
+				r.opsLock.Unlock()
 				return
 			}
-			slog.Default().Error("error checkpointing state, falling back to async response", "error", err)
+			logger.Default().Warn("error checkpointing state, falling back to async response", "error", err)
 		})
 	default:
 		// Do nothing else.
@@ -309,7 +317,10 @@ func (r *requestCtxManager) AppendOp(ctx context.Context, op GeneratorOpcode) {
 }
 
 func (r *requestCtxManager) Ops() []GeneratorOpcode {
-	return r.ops
+	// copy the response buffer because checkpoint callbacks share the slice.
+	r.opsLock.Lock()
+	defer r.opsLock.Unlock()
+	return slices.Clone(r.ops)
 }
 
 func (r *requestCtxManager) CallContext() middleware.CallContext {
@@ -323,6 +334,8 @@ func (r *requestCtxManager) CallContext() middleware.CallContext {
 		Env:          r.request.CallCtx.Env,
 		RunID:        r.request.CallCtx.RunID,
 		Attempt:      r.request.CallCtx.Attempt,
+		RequestID:    r.request.CallCtx.RequestID,
+		JobID:        r.request.CallCtx.JobID,
 	}
 }
 
@@ -377,6 +390,10 @@ func (r *requestCtxManager) SetSteps(steps map[string]json.RawMessage) {
 // before the first step execution in REST-based sync functions.
 func (r *requestCtxManager) SetFn(f fn.ServableFunction) {
 	r.fn = f
+}
+
+func (r *requestCtxManager) CloseCheckpointer() {
+	r.checkpointer.Close()
 }
 
 func (r *requestCtxManager) NewOp(op enums.Opcode, id string) UnhashedOp {
